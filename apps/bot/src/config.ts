@@ -6,18 +6,26 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 loadEnv({ path: resolve(__dirname, '../../../.env') });
 
+/** Пустые строки в .env трактуем как «не задано» */
+const emptyAsUndefined = (val: unknown) =>
+  typeof val === 'string' && val.trim() === '' ? undefined : val;
+
+const optionalUrl = z.preprocess(emptyAsUndefined, z.string().url().optional());
+const optionalString = z.preprocess(emptyAsUndefined, z.string().optional());
+
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   BOT_TOKEN: z.string().min(1),
   ALLOWED_TELEGRAM_USER_ID: z.coerce.number().int().positive(),
   DEFAULT_TIMEZONE: z.string().default('Europe/Helsinki'),
-  SUPABASE_URL: z.string().url().optional(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
-  OPENAI_API_KEY: z.string().optional(),
+  SUPABASE_URL: optionalUrl,
+  SUPABASE_SERVICE_ROLE_KEY: optionalString,
+  OPENAI_API_KEY: optionalString,
   OPENAI_MODEL: z.string().default('gpt-4o-mini'),
-  TELEGRAM_MINI_APP_URL: z.string().url().optional(),
-  SESSION_SECRET: z.string().optional(),
-  WEBHOOK_URL: z.string().url().optional(),
+  TELEGRAM_MINI_APP_URL: optionalUrl,
+  SESSION_SECRET: optionalString,
+  WEBHOOK_URL: optionalUrl,
+  TELEGRAM_PROXY: optionalString,
   PORT: z.coerce.number().default(3000),
 });
 
