@@ -1,0 +1,15 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: apps/bot/Dockerfile
+    env_file: .env
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/bot/Dockerfile
+    command: ['node', 'dist/workers/reminder-dispatcher.js']
+    env_file: .env
+    restart: unless-stopped
