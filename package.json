@@ -1,0 +1,29 @@
+{
+  "name": "skin-mne",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/bot",
+    "apps/web",
+    "packages/shared"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "eslint": "^9.28.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.33.0"
+  },
+  "scripts": {
+    "dev:bot": "npm run dev -w @skin-mne/bot",
+    "dev:web": "npm run dev -w @skin-mne/web",
+    "dev:worker": "npm run dev:worker -w @skin-mne/bot",
+    "build": "npm run build -ws --if-present",
+    "typecheck": "npm run typecheck -ws --if-present",
+    "lint": "npm run lint -ws --if-present",
+    "test": "npm run test -ws --if-present"
+  }
+}
