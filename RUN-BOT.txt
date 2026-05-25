@@ -1,0 +1,27 @@
+VPN включён, но бот не видит Telegram?
+→ VPN в браузере ≠ прокси для Node. Нужен ЛОКАЛЬНЫЙ порт в VPN-клиенте.
+→ Запустите:  powershell -ExecutionPolicy Bypass -File scripts\find-vpn-port.ps1
+→ В .env: TELEGRAM_PROXY=http://127.0.0.1:ПОРТ  (порт из настроек Clash/Happ/V2rayN)
+
+Запуск бота на Windows (если PowerShell ругается на ExecutionPolicy):
+
+  1) Двойной клик или в cmd:
+     scripts\start-bot.cmd
+
+  2) В PowerShell:
+     npm.cmd run dev:bot
+
+  3) Или полный путь:
+     & "C:\Program Files\nodejs\npm.cmd" run dev:bot
+
+Дождитесь: Bot is running @...
+
+Постоянно на этом ПК (автозапуск при входе в Windows):
+  powershell -ExecutionPolicy Bypass -File scripts\install-autostart.ps1
+  (нужен автозапуск v2rayTun + TELEGRAM_PROXY в .env)
+  Подробно: docs\AUTOSTART-WINDOWS.md
+
+Production без watch:
+  scripts\run-bot-production.cmd
+
+24/7 без ПК: VPS — docs\DEPLOYMENT.md

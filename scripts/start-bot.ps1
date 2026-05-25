@@ -14,4 +14,4 @@ try {
 }
 
 Write-Host "`nЗапуск npm run dev:bot (должно появиться: Bot is running @...)`n"
-npm run dev:bot
+& "$env:ProgramFiles\nodejs\npm.cmd" run dev:bot

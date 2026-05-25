@@ -1,6 +1,6 @@
-import OpenAI from 'openai';
 import { AiIntentSchema, AI_CONFIDENCE_THRESHOLD, type AiIntent } from '@skin-mne/shared';
 import { getEnv, hasOpenAI } from '../config.js';
+import { getOpenAIClient } from '../utils/openai-client.js';
 import { logger } from '../utils/logger.js';
 
 export function isAiEnabled(): boolean {
@@ -10,7 +10,7 @@ export function isAiEnabled(): boolean {
 export async function classifyText(text: string): Promise<AiIntent | null> {
   if (!hasOpenAI()) return null;
 
-  const client = new OpenAI({ apiKey: getEnv().OPENAI_API_KEY });
+  const client = getOpenAIClient();
   const response = await client.chat.completions.create({
     model: getEnv().OPENAI_MODEL,
     response_format: { type: 'json_object' },
@@ -44,7 +44,7 @@ confidence 0-1. clarificationNeeded true если не уверен.`,
 export async function transcribeVoice(filePath: string): Promise<string | null> {
   if (!hasOpenAI()) return null;
 
-  const client = new OpenAI({ apiKey: getEnv().OPENAI_API_KEY });
+  const client = getOpenAIClient();
   const { createReadStream } = await import('node:fs');
   const transcription = await client.audio.transcriptions.create({
     file: createReadStream(filePath),

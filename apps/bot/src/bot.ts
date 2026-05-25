@@ -1,30 +1,34 @@
 import { Bot, session, type BotConfig } from 'grammy';
-import { ProxyAgent, fetch as undiciFetch } from 'undici';
+import type { UserFromGetMe } from 'grammy/types';
 import type { BotContext, SessionData } from './types/context.js';
 import { getEnv } from './config.js';
 import { accessMiddleware } from './middleware/access.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { registerHandlers } from './handlers/index.js';
+import { getTelegramFetch } from './utils/proxy-fetch.js';
+import { installProxyApi } from './utils/proxy-api.js';
 
 function initialSession(): SessionData {
   return {};
 }
 
 function buildBotConfig(): BotConfig<BotContext> | undefined {
-  const proxy = getEnv().TELEGRAM_PROXY;
-  if (!proxy) return undefined;
-
-  const dispatcher = new ProxyAgent(proxy);
-  const customFetch = (url: string | URL, init?: RequestInit) =>
-    undiciFetch(url, { ...init, dispatcher } as never) as unknown as Promise<Response>;
+  const customFetch = getTelegramFetch();
+  if (!customFetch) return undefined;
 
   return {
-    client: { fetch: customFetch as typeof fetch },
+    client: {
+      fetch: customFetch as typeof fetch,
+      baseFetchConfig: {},
+    },
   } as unknown as BotConfig<BotContext>;
 }
 
-export function createBot(): Bot<BotContext> {
-  const bot = new Bot<BotContext>(getEnv().BOT_TOKEN, buildBotConfig());
+export function createBot(botInfo?: UserFromGetMe): Bot<BotContext> {
+  const base = buildBotConfig() ?? {};
+  const config = botInfo ? { ...base, botInfo } : base;
+  const bot = new Bot<BotContext>(getEnv().BOT_TOKEN, config);
+  installProxyApi(bot);
 
   bot.use(session({ initial: initialSession }));
   bot.use(errorHandler);
